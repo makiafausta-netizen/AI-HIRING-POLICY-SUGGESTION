@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Auditing AI in Hiring | A Policy Proposal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --pink-light: #fce8f0;
+      --pink-mid: #f5b8d4;
+      --pink-deep: #e07aab;
+      --purple-light: #ede8f9;
+      --purple-mid: #c4aeed;
+      --purple-deep: #8a5ec8;
+      --lavender: #d5ccf5;
+      --cream: #fdf8fd;
+      --white: #ffffff;
+      --text-dark: #2a1a35;
+      --text-mid: #5a3d72;
+      --text-soft: #8c6fa8;
+      --border: rgba(196,174,237,0.35);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* ---- NAV ---- */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 3rem;
+      background: rgba(253,248,253,0.82);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-weight: 600;
+      color: var(--purple-deep); letter-spacing: 0.02em;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.83rem; font-weight: 500; letter-spacing: 0.05em;
+      color: var(--text-mid); text-decoration: none;
+      text-transform: uppercase; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--purple-deep); }
+
+    /* ---- HERO ---- */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      text-align: center;
+      padding: 7rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(160deg, #fce8f6 0%, #ede8f9 40%, #fdf0f8 80%, #f0eaff 100%);
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -120px; right: -100px;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,184,212,0.38) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -80px; left: -80px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,174,237,0.32) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--purple-deep);
+      background: rgba(196,174,237,0.22);
+      border: 1px solid var(--purple-mid);
+      padding: 0.35rem 1rem; border-radius: 100px; margin-bottom: 2rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      font-weight: 700; line-height: 1.08;
+      color: var(--text-dark);
+      max-width: 860px;
+      animation: fadeUp 0.9s 0.1s ease both;
+    }
+    .hero h1 em {
+      font-style: italic; color: var(--purple-deep);
+    }
+    .hero-sub {
+      margin-top: 1.6rem;
+      font-size: 1.08rem; font-weight: 300; line-height: 1.75;
+      color: var(--text-mid); max-width: 640px;
+      animation: fadeUp 1s 0.2s ease both;
+    }
+    .hero-cta {
+      margin-top: 2.8rem;
+      display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 1s 0.35s ease both;
+    }
+    .btn-primary {
+      padding: 0.85rem 2rem; border-radius: 100px;
+      background: linear-gradient(135deg, var(--purple-deep), var(--pink-deep));
+      color: #fff; font-weight: 500; font-size: 0.92rem;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 6px 24px rgba(138,94,200,0.25);
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+    .btn-outline {
+      padding: 0.85rem 2rem; border-radius: 100px;
+      background: transparent; color: var(--purple-deep);
+      font-weight: 500; font-size: 0.92rem;
+      border: 1.5px solid var(--purple-mid); cursor: pointer;
+      text-decoration: none; transition: background 0.2s, transform 0.2s;
+    }
+    .btn-outline:hover { background: var(--purple-light); transform: translateY(-2px); }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+      animation: fadeUp 1.2s 0.6s ease both;
+    }
+    .scroll-indicator span { font-size: 0.7rem; letter-spacing: 0.12em; color: var(--text-soft); text-transform: uppercase; }
+    .scroll-dot {
+      width: 1.2px; height: 38px;
+      background: linear-gradient(to bottom, var(--purple-mid), transparent);
+      animation: scrollPulse 1.8s infinite;
+    }
+
+    /* ---- SECTION BASE ---- */
+    section { padding: 6rem 2rem; }
+    .container { max-width: 1060px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--purple-deep); font-weight: 500; margin-bottom: 0.8rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; line-height: 1.15;
+      color: var(--text-dark); margin-bottom: 1.5rem;
+    }
+    .section-title em { font-style: italic; color: var(--purple-deep); }
+    .section-body {
+      font-size: 1rem; line-height: 1.88; color: var(--text-mid); font-weight: 300;
+    }
+    .section-body p + p { margin-top: 1.2rem; }
+
+    /* ---- PROBLEM SECTION ---- */
+    .problem-section { background: var(--white); }
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; margin-top: 3rem;
+    }
+    .problem-visual {
+      position: relative; border-radius: 24px; overflow: hidden;
+      background: linear-gradient(135deg, #fce8f0 0%, #ede8f9 100%);
+      padding: 2.5rem;
+      border: 1px solid var(--border);
+    }
+    .stat-cards { display: flex; flex-direction: column; gap: 1rem; }
+    .stat-card {
+      background: white; border-radius: 16px; padding: 1.4rem 1.6rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(138,94,200,0.07);
+      transition: transform 0.25s;
+    }
+    .stat-card:hover { transform: translateY(-3px); }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif; font-size: 2.6rem; font-weight: 600;
+      color: var(--purple-deep); line-height: 1;
+    }
+    .stat-label { font-size: 0.85rem; color: var(--text-mid); margin-top: 0.3rem; line-height: 1.4; }
+
+    /* ---- TIMELINE / CASE STUDY ---- */
+    .cases-section {
+      background: linear-gradient(160deg, var(--purple-light) 0%, var(--pink-light) 100%);
+    }
+    .case-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2.5rem; }
+    .case-card {
+      background: white; border-radius: 20px; padding: 2rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(138,94,200,0.08);
+      transition: transform 0.25s, box-shadow 0.25s;
+      position: relative; overflow: hidden;
+    }
+    .case-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    }
+    .case-card.amazon::before { background: linear-gradient(90deg, #e07aab, #c4aeed); }
+    .case-card.hirevue::before { background: linear-gradient(90deg, #8a5ec8, #f5b8d4); }
+    .case-card.personal::before { background: linear-gradient(90deg, #c4aeed, #f5b8d4); }
+    .case-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(138,94,200,0.14); }
+    .case-year {
+      font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--purple-deep); font-weight: 500; margin-bottom: 0.6rem;
+    }
+    .case-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 600;
+      color: var(--text-dark); margin-bottom: 0.8rem; line-height: 1.2;
+    }
+    .case-body { font-size: 0.9rem; line-height: 1.72; color: var(--text-mid); font-weight: 300; }
+
+    /* ---- ETHICS SECTION ---- */
+    .ethics-section { background: var(--white); }
+    .ethics-split {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;
+    }
+    .ethics-card {
+      border-radius: 20px; padding: 2.4rem;
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .ethics-card.consequentialism {
+      background: linear-gradient(145deg, #fce8f0, #fdf0f8);
+    }
+    .ethics-card.rawlsian {
+      background: linear-gradient(145deg, #ede8f9, #e8e0fa);
+    }
+    .ethics-icon { font-size: 2.4rem; margin-bottom: 1rem; }
+    .ethics-name {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 600;
+      color: var(--text-dark); margin-bottom: 0.4rem;
+    }
+    .ethics-quote {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 1.05rem; color: var(--purple-deep); margin-bottom: 1rem;
+      border-left: 2.5px solid var(--purple-mid); padding-left: 1rem;
+    }
+    .ethics-body { font-size: 0.9rem; line-height: 1.75; color: var(--text-mid); font-weight: 300; }
+    .ethics-verdict {
+      margin-top: 2rem; padding: 1.2rem 1.6rem; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(138,94,200,0.08), rgba(224,122,171,0.08));
+      border: 1px solid var(--border);
+    }
+    .ethics-verdict p { font-size: 0.92rem; line-height: 1.7; color: var(--text-mid); }
+
+    /* ---- PROPOSAL SECTION ---- */
+    .proposal-section {
+      background: linear-gradient(160deg, #f5eeff 0%, #fce8f4 100%);
+    }
+    .pillars { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2.5rem; }
+    .pillar {
+      display: grid; grid-template-columns: 56px 1fr; gap: 1.5rem; align-items: start;
+      background: white; border-radius: 18px; padding: 1.8rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(138,94,200,0.07);
+      transition: transform 0.22s;
+    }
+    .pillar:hover { transform: translateX(4px); }
+    .pillar-num {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--purple-deep), var(--pink-deep));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600;
+      color: white; flex-shrink: 0;
+    }
+    .pillar-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600;
+      color: var(--text-dark); margin-bottom: 0.5rem;
+    }
+    .pillar-body { font-size: 0.9rem; line-height: 1.75; color: var(--text-mid); font-weight: 300; }
+
+    /* ---- OBJECTIONS SECTION ---- */
+    .objections-section { background: var(--white); }
+    .objection-list { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 2.5rem; }
+    .objection {
+      border-radius: 16px; overflow: hidden; border: 1px solid var(--border);
+    }
+    .objection-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.3rem 1.6rem; background: var(--purple-light); cursor: pointer;
+      transition: background 0.2s;
+    }
+    .objection-header:hover { background: var(--lavender); }
+    .objection-q {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600;
+      color: var(--text-dark);
+    }
+    .objection-toggle { color: var(--purple-deep); font-size: 1.2rem; transition: transform 0.3s; }
+    .objection-toggle.open { transform: rotate(45deg); }
+    .objection-body {
+      padding: 0 1.6rem; max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s;
+      font-size: 0.9rem; line-height: 1.8; color: var(--text-mid); font-weight: 300;
+    }
+    .objection-body.open { max-height: 400px; padding: 1.3rem 1.6rem; }
+    .response-tag {
+      display: inline-block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--pink-deep); font-weight: 500; margin-bottom: 0.5rem;
+    }
+
+    /* ---- ALIGNMENT SECTION ---- */
+    .alignment-section {
+      background: linear-gradient(160deg, #fce8f4 0%, #ede8f9 50%, #f5eeff 100%);
+    }
+    .alignment-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.4rem; margin-top: 2.5rem;
+    }
+    .align-card {
+      background: white; border-radius: 18px; padding: 1.8rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 18px rgba(138,94,200,0.07);
+      transition: transform 0.22s;
+    }
+    .align-card:hover { transform: translateY(-4px); }
+    .align-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .align-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600;
+      color: var(--text-dark); margin-bottom: 0.5rem;
+    }
+    .align-body { font-size: 0.88rem; line-height: 1.72; color: var(--text-mid); font-weight: 300; }
+
+    /* ---- PULL QUOTE ---- */
+    .pullquote {
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, var(--purple-deep), var(--pink-deep));
+      text-align: center;
+    }
+    .pullquote blockquote {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-style: italic; color: white; max-width: 780px; margin: 0 auto;
+      line-height: 1.45; font-weight: 300;
+    }
+    .pullquote cite {
+      display: block; margin-top: 1.2rem; font-size: 0.82rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.65); font-style: normal;
+    }
+
+    /* ---- NYC LAW CALLOUT ---- */
+    .law-callout {
+      background: white; border-radius: 20px; padding: 2.2rem;
+      border: 1.5px solid var(--purple-mid);
+      display: flex; gap: 1.5rem; align-items: flex-start;
+      margin-top: 2.5rem;
+      box-shadow: 0 8px 32px rgba(138,94,200,0.1);
+    }
+    .law-icon {
+      font-size: 2.4rem; flex-shrink: 0;
+      background: var(--purple-light); border-radius: 12px;
+      width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;
+    }
+    .law-content h3 {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600;
+      color: var(--text-dark); margin-bottom: 0.5rem;
+    }
+    .law-content p { font-size: 0.9rem; line-height: 1.72; color: var(--text-mid); font-weight: 300; }
+
+    /* ---- CONCLUSION SECTION ---- */
+    .conclusion-section {
+      background: var(--white);
+    }
+    .conclusion-inner {
+      background: linear-gradient(135deg, #fce8f4, #ede8f9);
+      border-radius: 28px; padding: 3.5rem;
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .conclusion-inner::after {
+      content: '';
+      position: absolute; bottom: -60px; right: -60px;
+      width: 280px; height: 280px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,174,237,0.25), transparent 70%);
+    }
+
+    /* ---- REFERENCES ---- */
+    .references-section {
+      background: var(--purple-light);
+      padding: 4rem 2rem;
+    }
+    .references-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.8rem;
+    }
+    .ref-card {
+      background: white; border-radius: 14px; padding: 1.2rem 1.4rem;
+      border: 1px solid var(--border); font-size: 0.84rem; line-height: 1.65;
+      color: var(--text-mid); font-weight: 300;
+    }
+    .ref-card strong { color: var(--purple-deep); font-weight: 500; display: block; margin-bottom: 0.3rem; }
+
+    /* ---- FOOTER ---- */
+    footer {
+      background: var(--text-dark); padding: 2.5rem;
+      text-align: center; color: rgba(255,255,255,0.45);
+      font-size: 0.82rem; letter-spacing: 0.04em;
+    }
+    footer a { color: var(--purple-mid); text-decoration: none; }
+
+    /* ---- ANIMATIONS ---- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; } 50% { opacity: 1; }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.2rem; }
+      .nav-links { display: none; }
+      .problem-grid, .ethics-split { grid-template-columns: 1fr; }
+      .pillar { grid-template-columns: 1fr; }
+      .pillar-num { width: 44px; height: 44px; }
+      .conclusion-inner { padding: 2rem; }
+      .law-callout { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">AI Hiring Accountability</div>
+  <ul class="nav-links">
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#cases">Case Studies</a></li>
+    <li><a href="#ethics">Ethics</a></li>
+    <li><a href="#proposal">The Proposal</a></li>
+    <li><a href="#objections">Objections</a></li>
+    <li><a href="#alignment">Values</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-tag">Policy Proposal &nbsp;&bull;&nbsp; AI &amp; Employment</div>
+  <h1>When Algorithms <em>Decide</em> Who Gets a Job</h1>
+  <p class="hero-sub">
+    Artificial intelligence is screening millions of job applications before any human sees them. The systems doing this work have no binding rules, no required fairness checks, and no public accountability. This is a proposal to change that.
+  </p>
+  <div class="hero-cta">
+    <a href="#problem" class="btn-primary">Read the Proposal</a>
+    <a href="#proposal" class="btn-outline">Jump to Solutions</a>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-dot"></div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem-section" id="problem">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Part 1 &mdash; The Problem</p>
+      <h2 class="section-title">A Technology That <em>Moved Faster</em> Than the Rules</h2>
+    </div>
+    <div class="problem-grid">
+      <div class="reveal section-body">
+        <p>
+          Large companies regularly receive over one thousand applications for a single job posting. To manage that volume, many employers now rely on artificial intelligence to filter resumes, rank candidates, and even conduct initial video interviews. The technology is fast, consistent, and scalable. But the laws and standards designed to protect job seekers have not kept pace.
+        </p>
+        <p>
+          Philosopher James Moor described this kind of situation as a "policy vacuum": technology already in use with no clear rules about how it should work, and no established accountability when something goes wrong. AI hiring tools are a textbook example of that vacuum today.
+        </p>
+        <p>
+          There is also what Moor called a "conceptual vacuum" at play. Is an AI screening tool helping a recruiter, or is it actually making the decision about who gets considered? If it is making the decision, it should be held to the same standards expected of a human decision-maker. But companies can use the "it is just a tool" framing to sidestep that responsibility entirely.
+        </p>
+        <p>
+          The people most harmed by these gaps are those who already face the most barriers in the job market: women, racial minorities, people with disabilities, and people from immigrant backgrounds. They are more likely to be wrongly filtered out by systems trained on biased historical data. They are also far less likely to know why.
+        </p>
+      </div>
+      <div class="reveal">
+        <div class="problem-visual">
+          <div class="stat-cards">
+            <div class="stat-card">
+              <div class="stat-num">1,000+</div>
+              <div class="stat-label">Applications large companies can receive for a single job posting</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">0</div>
+              <div class="stat-label">U.S. jurisdictions currently requiring ongoing independent audits of AI hiring tools</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">72%</div>
+              <div class="stat-label">Of large companies now use some form of AI in their hiring process</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">No Rules</div>
+              <div class="stat-label">The EEOC has acknowledged problems but issued no binding requirements for AI hiring tools</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PULLQUOTE 1 -->
+<div class="pullquote">
+  <blockquote>
+    "The technology already exists and is being used, but clear guidelines do not yet exist for how it should work or who is responsible when something goes wrong."
+    <cite>James Moor, "What Is Computer Ethics?" (1985)</cite>
+  </blockquote>
+</div>
+
+<!-- CASE STUDIES -->
+<section class="cases-section" id="cases">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Part 2 &mdash; Real Examples</p>
+      <h2 class="section-title">This Is Not <em>Hypothetical</em></h2>
+      <p class="section-body">
+        The concerns raised in this proposal are backed by documented, real-world incidents. These are not edge cases or thought experiments.
+      </p>
+    </div>
+    <div class="case-cards">
+      <div class="case-card amazon reveal">
+        <div class="case-year">2014 to 2017 &nbsp;&bull;&nbsp; Amazon</div>
+        <div class="case-title">The Resume Sorter That Penalized Women</div>
+        <p class="case-body">
+          Amazon built an internal AI tool to screen resumes. It was trained on the company's own hiring data, which reflected a historically male workforce. The system learned to penalize resumes that included the word "women's" and downgraded graduates of all-women colleges. Amazon eventually shut the tool down, but not before it had influenced real hiring decisions. The bias was not a glitch. The system was doing exactly what it was designed to do: replicate past hiring patterns.
+        </p>
+      </div>
+      <div class="case-card hirevue reveal">
+        <div class="case-year">Ongoing &nbsp;&bull;&nbsp; HireVue and Video AI</div>
+        <div class="case-title">Judged by Facial Expressions</div>
+        <p class="case-body">
+          HireVue and similar platforms use AI to analyze facial expressions, word choice, and tone of voice during video interviews. Many researchers argue that these signals are not valid predictors of job performance. They may also systematically disadvantage people with disabilities, people who are neurodivergent, and people whose first language is not English. The 2019 AI Now Institute report found these tools regularly produce worse outcomes for women and people of color, often without companies even realizing it.
+        </p>
+      </div>
+      <div class="case-card personal reveal">
+        <div class="case-year">The Invisible Rejection</div>
+        <div class="case-title">Filtered Out, Then Called Back</div>
+        <p class="case-body">
+          The author of this proposal was once auto-rejected by an AI-based hiring platform, only to be contacted later by a recruiter because they were, in fact, qualified. The system had rejected them for an unknown reason. This experience is not unique. Candidates regularly receive rejections they cannot interpret, cannot challenge, and cannot learn from. There is no honest feedback, no path to understanding what the system considers acceptable, and no way to know whether bias played a role.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ETHICS -->
+<section class="ethics-section" id="ethics">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Part 3 &mdash; Ethical Framework</p>
+      <h2 class="section-title">Two Ways to <em>Think About</em> Fairness</h2>
+      <p class="section-body">
+        This proposal draws on two ethical frameworks to make the case for stronger accountability. They are not in conflict. Together they form a more complete picture than either could alone.
+      </p>
+    </div>
+    <div class="ethics-split">
+      <div class="ethics-card consequentialism reveal">
+        <div class="ethics-icon">&#9878;</div>
+        <div class="ethics-name">Consequentialism</div>
+        <div class="ethics-quote">Does the system produce good outcomes in practice?</div>
+        <p class="ethics-body">
+          Consequentialism evaluates actions based on their real-world results. From this perspective, AI hiring tools can make sense: they reduce bottlenecks, handle large volumes of applications, and may eliminate certain forms of human bias like favoritism toward familiar names.
+        </p>
+        <p class="ethics-body" style="margin-top:0.8rem;">
+          But consequentialism also demands we measure the harms. If a system filters out qualified candidates because of their gender, race, or background, those are real losses: lost income, lost opportunity, and lost talent for the companies involved. A system that is efficient on average but unfair in who it harms is not actually producing good outcomes. We cannot know which is true without measurement. That is why auditing matters under this framework.
+        </p>
+      </div>
+      <div class="ethics-card rawlsian reveal">
+        <div class="ethics-icon">&#9878;</div>
+        <div class="ethics-name">Rawlsian Justice</div>
+        <div class="ethics-quote">Would you agree to this system if you did not know your place in it?</div>
+        <p class="ethics-body">
+          John Rawls introduced the idea of the "veil of ignorance": a thought experiment where you design rules for society without knowing what role you will occupy in it. If you could be anyone, from a white man with an elite degree to a woman of color with a non-traditional background, what hiring system would you want?
+        </p>
+        <p class="ethics-body" style="margin-top:0.8rem;">
+          Rawls argued that inequalities are only just if they benefit those who are worst off. A biased AI hiring system does the opposite. It compounds disadvantages for people who already face more barriers, while making things faster and cheaper for the companies using the tool. That is unjust by Rawlsian standards. Fair systems are ones everyone could agree to under conditions where no one knew their own position.
+        </p>
+      </div>
+    </div>
+    <div class="ethics-verdict reveal">
+      <p>Used together, these frameworks avoid each other's blind spots. Consequentialism keeps us grounded in measurable outcomes. Rawlsian justice keeps us focused on whether those outcomes are fairly distributed. Both point toward the same conclusion: mandatory independent audits that preserve AI's efficiency benefits while building in real protections for fairness.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PULLQUOTE 2 -->
+<div class="pullquote">
+  <blockquote>
+    "If you did not know whether you would be a white man with a degree from a well-known university or a woman of color with a non-traditional background, what hiring system would you choose?"
+    <cite>Based on John Rawls, A Theory of Justice (1971)</cite>
+  </blockquote>
+</div>
+
+<!-- PROPOSAL -->
+<section class="proposal-section" id="proposal">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Part 4 &mdash; The Solution</p>
+      <h2 class="section-title">Mandatory <em>Independent</em> Algorithmic Audits</h2>
+      <p class="section-body">
+        Any company that uses AI to screen resumes, filter applicants, or conduct interviews must have that system reviewed by an outside organization before deploying it, and on a regular basis afterward. The goal is to create real accountability rather than simply hoping companies catch their own problems.
+      </p>
+    </div>
+
+    <div class="law-callout reveal">
+      <div class="law-icon">&#9998;</div>
+      <div class="law-content">
+        <h3>Precedent: New York City Local Law 144 (2021)</h3>
+        <p>New York City passed a law requiring bias audits for automated hiring tools, which took effect in July 2023. This proposal builds on that foundation by requiring audits to be fully independent, by adding stronger enforcement mechanisms, and by mandating ongoing monitoring rather than one-time reviews.</p>
+      </div>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar reveal">
+        <div class="pillar-num">1</div>
+        <div>
+          <div class="pillar-title">Pre-Deployment Review</div>
+          <p class="pillar-body">Before any AI hiring tool goes live, it must be reviewed by an accredited third-party auditor. The audit checks whether the system produces different outcomes for different demographic groups, whether the criteria it uses to rank candidates are actually valid predictors of job performance, and whether the decision process is documented clearly enough to be understood and challenged. If the system does not pass, the company cannot use it until the problems are corrected.</p>
+        </div>
+      </div>
+      <div class="pillar reveal">
+        <div class="pillar-num">2</div>
+        <div>
+          <div class="pillar-title">Ongoing Monitoring</div>
+          <p class="pillar-body">AI systems can drift over time even without intentional updates. The data they were trained on becomes outdated. The pool of applicants shifts. Audits must happen at least once a year and also any time a company makes significant changes to the system. Results must be reported to a regulatory agency and shared publicly, creating a transparent record of how the system performs across different groups over time.</p>
+        </div>
+      </div>
+      <div class="pillar reveal">
+        <div class="pillar-num">3</div>
+        <div>
+          <div class="pillar-title">Genuine Independence</div>
+          <p class="pillar-body">The company that built the tool and the company using it cannot audit their own systems. Neither can any organization with a financial connection to either of them. Auditing organizations must be certified by a government body and meet basic standards for expertise and transparency. Companies have a natural incentive to downplay problems in their own systems. Self-reporting does not work. Independence is not a preference, it is the whole point.</p>
+        </div>
+      </div>
+      <div class="pillar reveal">
+        <div class="pillar-num">4</div>
+        <div>
+          <div class="pillar-title">Real Enforcement</div>
+          <p class="pillar-body">If a company uses an unaudited system, or if problems are found and not corrected within a set period, there must be real consequences: financial penalties scaled to company size, suspension of the tool, and public notice of the violation so job seekers know what happened. Candidates who experienced bias from the system should also have a legal path to hold the company accountable for discriminatory outcomes. Compliance without consequences is just paperwork.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OBJECTIONS -->
+<section class="objections-section" id="objections">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Part 5 &mdash; Hard Questions</p>
+      <h2 class="section-title">The Strongest <em>Objections</em>, Addressed</h2>
+      <p class="section-body">
+        This proposal takes its critics seriously. Here are the most significant objections and how to respond to them honestly.
+      </p>
+    </div>
+    <div class="objection-list">
+      <div class="objection reveal">
+        <div class="objection-header" onclick="toggleObj(this)">
+          <span class="objection-q">There is no agreed-upon definition of what "fair" means for AI systems</span>
+          <span class="objection-toggle">+</span>
+        </div>
+        <div class="objection-body">
+          <span class="response-tag">The Objection</span>
+          <p>Researchers have identified multiple mathematically incompatible definitions of fairness, such as statistical parity, equalized odds, and predictive parity. A system could pass an audit under one definition while failing another. If companies choose which metric they are measured by, they will simply pick the one they already perform well on.</p>
+          <br/>
+          <span class="response-tag">The Response</span>
+          <p>Require companies to report results across multiple definitions of fairness rather than just one. This makes trade-offs visible and prevents gaming the system. Making the audit methodology itself public also helps: it is harder to manipulate a process when everyone can see exactly how it works.</p>
+        </div>
+      </div>
+      <div class="objection reveal">
+        <div class="objection-header" onclick="toggleObj(this)">
+          <span class="objection-q">Many AI systems are too complex to audit meaningfully</span>
+          <span class="objection-toggle">+</span>
+        </div>
+        <div class="objection-body">
+          <span class="response-tag">The Objection</span>
+          <p>Advanced AI systems can be so complex that even their creators cannot explain how they reach specific outputs. An auditor might observe what results come out but cannot understand why, which limits what an audit can actually tell us.</p>
+          <br/>
+          <span class="response-tag">The Response</span>
+          <p>If a system is too complex to explain or audit, that is itself a reason not to use it in something as consequential as hiring. The audit requirement would create a market incentive for developers to build more interpretable systems, because those are the only ones that can be certified and legally deployed.</p>
+        </div>
+      </div>
+      <div class="objection reveal">
+        <div class="objection-header" onclick="toggleObj(this)">
+          <span class="objection-q">Compliance costs could hurt smaller companies and create inequality</span>
+          <span class="objection-toggle">+</span>
+        </div>
+        <div class="objection-body">
+          <span class="response-tag">The Objection</span>
+          <p>Mandatory audits create real costs. Smaller companies may not be able to afford them, which could concentrate AI hiring tools among the largest employers. It also raises the question of who funds the auditing infrastructure, and whether third-party auditors have financial incentives to favor the companies that pay them.</p>
+          <br/>
+          <span class="response-tag">The Response</span>
+          <p>Compliance requirements and fees should scale with company size. Smaller companies should receive government assistance. Large fines should be imposed on auditing organizations that show evidence of bias in favor of their paying clients. The answer to cost concerns is better-designed regulation, not abandoning accountability altogether.</p>
+        </div>
+      </div>
+      <div class="objection reveal">
+        <div class="objection-header" onclick="toggleObj(this)">
+          <span class="objection-q">Why not just ban AI hiring tools entirely?</span>
+          <span class="objection-toggle">+</span>
+        </div>
+        <div class="objection-body">
+          <span class="response-tag">The Objection</span>
+          <p>Given the documented harms, some argue these systems should simply not be used at all. A complete ban would eliminate the risk of biased filtering.</p>
+          <br/>
+          <span class="response-tag">The Response</span>
+          <p>A blanket ban is unlikely to work given how deeply these tools are embedded in modern recruiting. More importantly, it is not necessary. The goal is not to prevent technology from being used in hiring. It is to ensure that when it is used, it meets real fairness standards. Mandatory auditing accomplishes that without removing a tool that, when designed well, can also reduce certain kinds of human bias.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ALIGNMENT -->
+<section class="alignment-section" id="alignment">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Part 6 &mdash; Values and Alignment</p>
+      <h2 class="section-title">Whose Values Get <em>Built Into</em> These Systems?</h2>
+      <p class="section-body">
+        One of the most important things to understand about biased AI hiring tools is that the bias is usually not intentional. Amazon did not build a sexist system on purpose. What happened is that the system was trained on historical data that reflected years of biased hiring decisions, and it learned to replicate those patterns. The AI was doing its job correctly. The problem was that the job it was given was to reproduce a biased past.
+      </p>
+      <p class="section-body" style="margin-top:1rem;">
+        This means you cannot fix the problem by adjusting the algorithm alone. The deeper question is about what values get encoded into these systems from the start. Every design choice embeds an assumption about what good candidates look like.
+      </p>
+    </div>
+    <div class="alignment-grid">
+      <div class="align-card reveal">
+        <div class="align-icon">&#127979;</div>
+        <div class="align-title">University Prestige</div>
+        <p class="align-body">Weighting elite university degrees as a signal of quality seems neutral, but access to elite universities is heavily shaped by race and class. This criterion encodes inequality under the appearance of merit.</p>
+      </div>
+      <div class="align-card reveal">
+        <div class="align-icon">&#128336;</div>
+        <div class="align-title">Employment Gaps</div>
+        <p class="align-body">Penalizing gaps in employment history may seem reasonable, but women are more likely to have gaps because of caregiving responsibilities. A criterion that appears neutral can be systematically unfair.</p>
+      </div>
+      <div class="align-card reveal">
+        <div class="align-icon">&#129309;</div>
+        <div class="align-title">"Culture Fit"</div>
+        <p class="align-body">Screening for cultural fit often means selecting for people similar to whoever is already in the workplace. In practice, this tends to perpetuate existing demographic imbalances rather than address them.</p>
+      </div>
+      <div class="align-card reveal">
+        <div class="align-icon">&#128483;</div>
+        <div class="align-title">Facial Expressions</div>
+        <p class="align-body">Analyzing nonverbal cues during video interviews assumes there is a universal "interview face." This disadvantages neurodivergent individuals, people with disabilities, and non-native English speakers.</p>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top: 2.5rem;">
+      <div class="law-callout" style="background: white;">
+        <div class="law-icon">&#128101;</div>
+        <div class="law-content">
+          <h3>Who Should Have a Say</h3>
+          <p>A well-aligned AI hiring system should involve more than just the companies that build and use it. Job seekers, community organizations, and people historically excluded from certain industries should all have input into what criteria get used and what fairness looks like. Rejected candidates should receive personalized, meaningful explanations of why they were not selected, and they should have a path to challenge decisions they believe were unfair. Mandatory audits create a regular checkpoint where these questions must be raised, results made public, and value choices made visible.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section class="conclusion-section">
+  <div class="container">
+    <div class="conclusion-inner reveal">
+      <p class="section-label">Conclusion</p>
+      <h2 class="section-title">The Alternative Is <em>Silence</em></h2>
+      <div class="section-body">
+        <p>AI hiring tools are already making consequential decisions for millions of job seekers. The legal framework governing them has not caught up. The frameworks of consequentialism and Rawlsian justice both point toward the same need: a solution that preserves the efficiency benefits of AI while building in genuine protections for fairness.</p>
+        <p>Mandatory independent algorithmic audits are that solution. Pre-deployment review before tools go live. Ongoing monitoring so drift and change are caught. Genuine independence from the companies involved. Real enforcement with financial penalties and public transparency.</p>
+        <p>The strongest objections, around competing definitions of fairness, the complexity of black-box systems, and the cost burden of compliance, are all worth designing around carefully. They are reasons to build this regulation thoughtfully. They are not reasons to abandon accountability.</p>
+        <p>The alternative is no requirements at all. It means the people hurt by biased AI systems, those who already face the most barriers in the job market, have no recourse and no explanation. That is not a neutral outcome. It is a choice to accept the status quo. This proposal is an attempt to choose differently, in a way that is practical, realistic, and grounded in the principles of transparency and fairness.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REFERENCES -->
+<section class="references-section">
+  <div class="container">
+    <p class="section-label">References</p>
+    <h2 class="section-title" style="font-size:1.8rem;">Sources</h2>
+    <div class="references-grid">
+      <div class="ref-card"><strong>Dastin, J. (2018)</strong>Amazon scraps secret AI recruiting tool that showed bias against women. Reuters, October 10, 2018.</div>
+      <div class="ref-card"><strong>Moor, J. H. (1985)</strong>What is computer ethics? Metaphilosophy, 16(4), 266-275.</div>
+      <div class="ref-card"><strong>New York City Council (2021)</strong>Local Law 144: Automated Employment Decision Tools.</div>
+      <div class="ref-card"><strong>Raji, I. D., &amp; Buolamwini, J. (2019)</strong>Actionable auditing: Investigating the impact of publicly naming biased performance results of commercial AI products.</div>
+      <div class="ref-card"><strong>Rawls, J. (1971)</strong>A Theory of Justice. Harvard University Press.</div>
+      <div class="ref-card"><strong>West, S. M., Whittaker, M., &amp; Crawford, K. (2019)</strong>Discriminating systems: Gender, race, and power in AI. AI Now Institute.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>A Policy Proposal on Mandatory Independent Algorithmic Audits for AI Hiring Systems</p>
+  <p style="margin-top:0.5rem;">Academic paper presented for coursework &bull; All rights reserved</p>
+</footer>
+
+<script>
+  // Accordion
+  function toggleObj(header) {
+    const body = header.nextElementSibling;
+    const toggle = header.querySelector('.objection-toggle');
+    const isOpen = body.classList.contains('open');
+    document.querySelectorAll('.objection-body').forEach(b => b.classList.remove('open'));
+    document.querySelectorAll('.objection-toggle').forEach(t => t.classList.remove('open'));
+    if (!isOpen) {
+      body.classList.add('open');
+      toggle.classList.add('open');
+    }
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
